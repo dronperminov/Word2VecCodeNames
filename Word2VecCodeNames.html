@@ -14,8 +14,9 @@
 
             <div class="buttons-box">
                 <button class="button" onclick="game.ResetField()">Очистить</button>
-                <button class="button" onclick="game.ChangeColor()">Сменить цвет</button>
                 <button class="button" onclick="game.GenerateField()">Сгенерировать</button>
+                <button class="button" onclick="game.ChangeColor()">Сменить цвет</button>
+                <button class="button" onclick="game.InitWords()">Сменить слова</button>
             </div>
         </div>
 
@@ -28,7 +29,9 @@
     <script src="js/words.js"></script>
     <script>
         let svg = document.getElementById('card-box')
-        let game = new CodeNamesGame(svg)
+        let wordsBox = document.getElementById('words-box')
+
+        let game = new CodeNamesGame(svg, wordsBox)
         game.GenerateField()
     </script>
 </body>

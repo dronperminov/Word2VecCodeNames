@@ -15,8 +15,9 @@ const RED_COLOR = 1
 
 const STATUSES = [EMPTY_STATUS, RED_STATUS, BLUE_STATUS, GAME_OVER_STATUS]
 
-function CodeNamesGame(field) {
+function CodeNamesGame(field, wordsBox) {
     this.field = field
+    this.wordsBox = wordsBox
 
     this.padding = 12
     this.border = 15
@@ -27,6 +28,7 @@ function CodeNamesGame(field) {
     this.colorIndex = BLUE_COLOR
 
     this.InitField()
+    this.InitWords()
 }
 
 CodeNamesGame.prototype.MakePath = function(stroke, fill, strokeWidth, d) {
@@ -242,4 +244,56 @@ CodeNamesGame.prototype.InitField = function() {
     `))
 
     this.InitCells(cellPadding, cellSize, cellOffset)
+}
+
+CodeNamesGame.prototype.MakeWordDiv = function(word, i, j) {
+    let div = document.createElement('div')
+    div.className = 'word-block'
+    div.id = 'word-' + i + '-' + j
+
+    let inner = document.createElement('div')
+    inner.className = 'word-inner-block'
+
+    let rotated = document.createElement('div')
+    rotated.className = 'rotated'
+    rotated.innerHTML = word
+
+    let input = document.createElement('input')
+    input.type = 'text'
+    input.value = word
+    input.className = 'word-input'
+    input.addEventListener('input', () => rotated.innerHTML = input.value)
+    input.addEventListener('change', () => rotated.innerHTML = input.value)
+
+    inner.appendChild(rotated)
+    inner.appendChild(document.createElement('hr'))
+    inner.appendChild(input)
+    div.appendChild(inner)
+
+    return div
+}
+
+CodeNamesGame.prototype.InitWords = function() {
+    let table = document.createElement('div')
+    table.className = 'table'
+
+    for (let i = 0; i < CELL_COUNT; i++) {
+        let tr = document.createElement('div')
+
+        for (let j = 0; j < CELL_COUNT; j++) {
+            let word = WORDS[Math.floor(Math.random() * WORDS.length)]
+            let div = this.MakeWordDiv(word, i, j)
+            let td = document.createElement('div')
+            td.className = 'cell'
+            td.style.width = (100 / CELL_COUNT) + '%'
+
+            td.appendChild(div)
+            tr.appendChild(td)
+        }
+
+        table.appendChild(tr)
+    }
+
+    this.wordsBox.innerHTML = ''
+    this.wordsBox.appendChild(table)
 }
