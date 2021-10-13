@@ -138,8 +138,6 @@ CodeNamesGame.prototype.InitCells = function(cellPadding, cellSize, cellOffset) 
 }
 
 CodeNamesGame.prototype.GenerateField = function() {
-    this.SetColor(Math.random() < 0.5 ? 1 : 0)
-
     let redCount = Math.floor((CELL_COUNT*CELL_COUNT - 1) / 3)
     let blueCount = redCount + 1
     let emptyCount = CELL_COUNT*CELL_COUNT - redCount - blueCount - 1
@@ -166,6 +164,10 @@ CodeNamesGame.prototype.GenerateField = function() {
     for (let i = 0; i < CELL_COUNT * CELL_COUNT; i++) {
         this.SetCellStatus(i, statuses.pop())
     }
+}
+
+CodeNamesGame.prototype.ChangeColor = function() {
+    this.SetColor(this.colorIndex == RED_COLOR ? BLUE_COLOR : RED_COLOR)
 }
 
 CodeNamesGame.prototype.ResetField = function() {

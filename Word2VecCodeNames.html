@@ -5,13 +5,27 @@
     <title>Кодовые имена на word2vec</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
-<body oncontextmenu="return false">
+<body>
     <div class="game">
-        <div class="card-box"><svg id="card-box"></svg></div>
-        <div class="word-box" id="words-box"></div>
+        <div class="cell" id="left-cell">
+            <div class="card-box">
+                <svg id="card-box" oncontextmenu="return false"></svg>
+            </div>
+
+            <div class="buttons-box">
+                <button class="button" onclick="game.ResetField()">Очистить</button>
+                <button class="button" onclick="game.ChangeColor()">Сменить цвет</button>
+                <button class="button" onclick="game.GenerateField()">Сгенерировать</button>
+            </div>
+        </div>
+
+        <div class="cell" id="right-cell">
+            <div class="word-box" id="words-box"></div>
+        </div>
     </div>
 
-    <script src="CodeNamesGame.js"></script>
+    <script src="js/CodeNamesGame.js"></script>
+    <script src="js/words.js"></script>
     <script>
         let svg = document.getElementById('card-box')
         let game = new CodeNamesGame(svg)
