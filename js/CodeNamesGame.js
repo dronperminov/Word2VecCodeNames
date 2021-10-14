@@ -27,6 +27,12 @@ function CodeNamesGame(field, wordsBox) {
     this.fieldBorderColors = ['#416fad', '#9d3b3a']
     this.colorIndex = BLUE_COLOR
 
+    this.cardUrls = {}
+    this.cardUrls[RED_STATUS] = ['cards/red1.jpg', 'cards/red2.jpg', 'cards/red_blue.jpg']
+    this.cardUrls[BLUE_STATUS] = ['cards/blue1.jpg', 'cards/blue2.jpg', 'cards/blue_red.jpg']
+    this.cardUrls[EMPTY_STATUS] = ['cards/empty1.jpg', 'cards/empty2.jpg']
+    this.cardUrls[GAME_OVER_STATUS] = ['cards/game_over.jpg']
+
     this.InitField()
     this.InitWords()
 }
@@ -105,13 +111,20 @@ CodeNamesGame.prototype.SetColor = function(colorIndex) {
     this.colorsPath.setAttribute('stroke', this.fieldBorderColors[this.colorIndex])
 }
 
-CodeNamesGame.prototype.SetCellStatus = function(cellIndex, status) {
+CodeNamesGame.prototype.SetCellStatus = function(cellIndex, status, needHide = false) {
     let cell = this.cells[cellIndex]
     this.field.removeChild(cell.cell)
     cell.status = status
     cell.cell = this.MakeCell(cell.x, cell.y, cell.cellSize, cell.status)
     this.field.appendChild(cell.cell)
     cell.cell.addEventListener('mousedown', (e) => this.UpdateCell(e, cellIndex))
+
+    let img = document.getElementById('card-img-' + cellIndex)
+    img.src = this.Choice(this.cardUrls[status])
+
+    if (needHide) {
+        img.style.display = 'none'
+    }
 }
 
 CodeNamesGame.prototype.UpdateCell = function(e, cellIndex) {
@@ -126,8 +139,8 @@ CodeNamesGame.prototype.InitCells = function(cellPadding, cellSize, cellOffset) 
 
     for (let i = 0; i < CELL_COUNT; i++) {
         for (let j = 0; j < CELL_COUNT; j++) {
-            let x = cellPadding + i * (cellSize + cellOffset)
-            let y = cellPadding + j * (cellSize + cellOffset)
+            let x = cellPadding + j * (cellSize + cellOffset)
+            let y = cellPadding + i * (cellSize + cellOffset)
             let statuses = [EMPTY_STATUS, RED_STATUS, BLUE_STATUS, GAME_OVER_STATUS]
             let cell = this.MakeCell(x, y, cellSize, EMPTY_STATUS)
 
@@ -174,7 +187,7 @@ CodeNamesGame.prototype.ChangeColor = function() {
 
 CodeNamesGame.prototype.ResetField = function() {
     for (let i = 0; i < CELL_COUNT * CELL_COUNT; i++) {
-        this.SetCellStatus(i, EMPTY_STATUS)
+        this.SetCellStatus(i, EMPTY_STATUS, true)
     }
 }
 
@@ -253,10 +266,21 @@ CodeNamesGame.prototype.MakeDiv = function(className = '', innerHTML = '') {
     return div
 }
 
-CodeNamesGame.prototype.MakeWordDiv = function(word, i, j) {
+CodeNamesGame.prototype.Choice = function(collection) {
+    return collection[Math.floor(Math.random() * collection.length)]
+}
+
+CodeNamesGame.prototype.ClickByCard = function(e, div, img) {
+    if (e.target.tagName == 'INPUT')
+        return
+
+    img.style.display = img.style.display == 'none' ? '' : 'none'
+}
+
+CodeNamesGame.prototype.MakeWordDiv = function(word, index) {
     let div = document.createElement('div')
     div.className = 'word-block'
-    div.id = 'word-' + (i * CELL_COUNT + j)
+    div.id = 'word-' + index
 
     let inner = this.MakeDiv('word-inner-block')
     let circle = this.MakeDiv('circle-block')
@@ -280,6 +304,14 @@ CodeNamesGame.prototype.MakeWordDiv = function(word, i, j) {
     inner.appendChild(bottom)
     div.appendChild(inner)
 
+    let img = document.createElement('img')
+    img.src = this.Choice(this.cardUrls[this.cells[index].status])
+    img.className = 'card-img'
+    img.id = 'card-img-' + index
+    img.style.display = 'none'
+    div.appendChild(img)
+
+    div.addEventListener('mousedown', (e) => this.ClickByCard(e, div, img))
     return div
 }
 
@@ -287,10 +319,10 @@ CodeNamesGame.prototype.GetRandomWords = function(n) {
     let words = new Set()
 
     for (let i = 0; i < n; i++) {
-        let word = WORDS[Math.floor(Math.random() * WORDS.length)]
+        let word = this.Choice(WORDS)
 
         while (words.has(word))
-            word = WORDS[Math.floor(Math.random() * WORDS.length)]
+            word = this.Choice(WORDS)
 
         words.add(word)
     }
@@ -308,7 +340,8 @@ CodeNamesGame.prototype.InitWords = function() {
 
         for (let j = 0; j < CELL_COUNT; j++) {
             let word = words[i * CELL_COUNT + j]
-            let div = this.MakeWordDiv(word, i, j)
+            let div = this.MakeWordDiv(word, i * CELL_COUNT + j)
+
             let td = document.createElement('div')
             td.className = 'cell'
             td.style.width = (100 / CELL_COUNT) + '%'
@@ -322,4 +355,11 @@ CodeNamesGame.prototype.InitWords = function() {
 
     this.wordsBox.innerHTML = ''
     this.wordsBox.appendChild(table)
+}
+
+CodeNamesGame.prototype.HideCardImages = function() {
+    for (let i = 0; i < CELL_COUNT * CELL_COUNT; i++) {
+        let img = document.getElementById('card-img-' + i)
+        img.style.display = 'none'
+    }
 }
