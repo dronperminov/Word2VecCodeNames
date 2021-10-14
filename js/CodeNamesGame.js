@@ -246,17 +246,23 @@ CodeNamesGame.prototype.InitField = function() {
     this.InitCells(cellPadding, cellSize, cellOffset)
 }
 
+CodeNamesGame.prototype.MakeDiv = function(className = '', innerHTML = '') {
+    let div = document.createElement('div')
+    div.className = className
+    div.innerHTML = innerHTML
+    return div
+}
+
 CodeNamesGame.prototype.MakeWordDiv = function(word, i, j) {
     let div = document.createElement('div')
     div.className = 'word-block'
-    div.id = 'word-' + i + '-' + j
+    div.id = 'word-' + (i * CELL_COUNT + j)
 
-    let inner = document.createElement('div')
-    inner.className = 'word-inner-block'
+    let inner = this.MakeDiv('word-inner-block')
+    let circle = this.MakeDiv('circle-block')
+    circle.appendChild(this.MakeDiv('circle'))
 
-    let rotated = document.createElement('div')
-    rotated.className = 'rotated'
-    rotated.innerHTML = word
+    let rotated = this.MakeDiv('rotated', word)
 
     let input = document.createElement('input')
     input.type = 'text'
@@ -265,23 +271,43 @@ CodeNamesGame.prototype.MakeWordDiv = function(word, i, j) {
     input.addEventListener('input', () => rotated.innerHTML = input.value)
     input.addEventListener('change', () => rotated.innerHTML = input.value)
 
-    inner.appendChild(rotated)
-    inner.appendChild(document.createElement('hr'))
-    inner.appendChild(input)
+    let bottom = this.MakeDiv('bottom')
+
+    bottom.appendChild(rotated)
+    bottom.appendChild(document.createElement('hr'))
+    bottom.appendChild(input)
+    inner.appendChild(circle)
+    inner.appendChild(bottom)
     div.appendChild(inner)
 
     return div
 }
 
+CodeNamesGame.prototype.GetRandomWords = function(n) {
+    let words = new Set()
+
+    for (let i = 0; i < n; i++) {
+        let word = WORDS[Math.floor(Math.random() * WORDS.length)]
+
+        while (words.has(word))
+            word = WORDS[Math.floor(Math.random() * WORDS.length)]
+
+        words.add(word)
+    }
+
+    return Array.from(words)
+}
+
 CodeNamesGame.prototype.InitWords = function() {
     let table = document.createElement('div')
     table.className = 'table'
+    let words = this.GetRandomWords(CELL_COUNT * CELL_COUNT)
 
     for (let i = 0; i < CELL_COUNT; i++) {
         let tr = document.createElement('div')
 
         for (let j = 0; j < CELL_COUNT; j++) {
-            let word = WORDS[Math.floor(Math.random() * WORDS.length)]
+            let word = words[i * CELL_COUNT + j]
             let div = this.MakeWordDiv(word, i, j)
             let td = document.createElement('div')
             td.className = 'cell'

@@ -24,7 +24,7 @@
 #right-cell {
     width: 100%;
     vertical-align: top;
-    padding: 0 5px;
+    padding: 0 10px;
 }
 
 .card-box svg {
@@ -63,6 +63,7 @@
     border-radius: 10px;
     padding: 12px;
     margin: 0 2px 8px 2px;
+    aspect-ratio: 1.85;
 }
 
 .word-block .rotated {
@@ -70,12 +71,15 @@
     color: #b99e93;
     font-weight: bold;
     text-align: center;
+    font-style: italic;
 }
 
 .word-inner-block {
     border: 2px solid #b99e93;
     border-radius: 10px;
-    padding: 50px 5px 8px 5px;
+    padding: 5px;
+    height: 100%;
+    display: table;
 }
 
 .word-inner-block hr {
@@ -106,4 +110,24 @@
 
 .cell {
     display: table-cell;
+    vertical-align: top;
+}
+
+.circle {
+    width: 10px;
+    height: 10px;
+    border: 2px solid #b99e93;
+    border-radius: 100%;
+    margin: 0 auto 5px auto;
+}
+
+.circle-block {
+    width: 100%;
+    display: table-row;
+}
+
+.bottom {
+    display: table-cell;
+    vertical-align: bottom;
+    height: 100%;
 }
