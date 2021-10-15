@@ -181,6 +181,8 @@ CodeNamesGame.prototype.GenerateField = function() {
     for (let i = 0; i < CELL_COUNT * CELL_COUNT; i++) {
         this.SetCellStatus(i, statuses.pop())
     }
+
+    this.FindWords()
 }
 
 CodeNamesGame.prototype.ChangeColor = function() {
@@ -277,6 +279,7 @@ CodeNamesGame.prototype.ClickByCard = function(e, div, img) {
         return
 
     img.style.display = img.style.display == 'none' ? '' : 'none'
+    this.FindWords()
 }
 
 CodeNamesGame.prototype.MakeWordDiv = function(word, index) {
@@ -358,6 +361,7 @@ CodeNamesGame.prototype.InitWords = function() {
 
     this.wordsBox.innerHTML = ''
     this.wordsBox.appendChild(table)
+    this.FindWords()
 }
 
 CodeNamesGame.prototype.HideCardImages = function() {
@@ -365,6 +369,8 @@ CodeNamesGame.prototype.HideCardImages = function() {
         let img = document.getElementById('card-img-' + i)
         img.style.display = 'none'
     }
+
+    this.FindWords()
 }
 
 CodeNamesGame.prototype.GetNonOpenedWords = function(status) {
@@ -391,6 +397,9 @@ CodeNamesGame.prototype.InitEmbedding = function() {
 }
 
 CodeNamesGame.prototype.FindWords = function() {
+    if (this.predictionsBox.style.display != '')
+        return
+
     let status = document.getElementById('color-box').value
     let wordsCount = +document.getElementById('word-count-box').value
 
