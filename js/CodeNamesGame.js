@@ -15,9 +15,11 @@ const RED_COLOR = 1
 
 const STATUSES = [EMPTY_STATUS, RED_STATUS, BLUE_STATUS, GAME_OVER_STATUS]
 
-function CodeNamesGame(field, wordsBox) {
+function CodeNamesGame(field, wordsBox, predictionsBox) {
     this.field = field
     this.wordsBox = wordsBox
+    this.predictionsBox = predictionsBox
+    this.predictionsBox.style.display = 'none'
 
     this.padding = 12
     this.border = 15
@@ -292,6 +294,7 @@ CodeNamesGame.prototype.MakeWordDiv = function(word, index) {
     input.type = 'text'
     input.value = word
     input.className = 'word-input'
+    input.id = 'word-input-' + index
     input.addEventListener('input', () => rotated.innerHTML = input.value)
     input.addEventListener('change', () => rotated.innerHTML = input.value)
 
@@ -361,5 +364,60 @@ CodeNamesGame.prototype.HideCardImages = function() {
     for (let i = 0; i < CELL_COUNT * CELL_COUNT; i++) {
         let img = document.getElementById('card-img-' + i)
         img.style.display = 'none'
+    }
+}
+
+CodeNamesGame.prototype.GetNonOpenedWords = function(status) {
+    let words = []
+
+    for (let i = 0; i < CELL_COUNT * CELL_COUNT; i++) {
+        if (this.cells[i].status != status)
+            continue
+
+        if (document.getElementById('card-img-' + i).style.display != 'none')
+            continue
+
+        let word = document.getElementById('word-input-' + i).value
+        words.push(word.toLowerCase())
+    }
+
+    return words
+}
+
+CodeNamesGame.prototype.InitEmbedding = function() {
+    this.predictionsBox.style.display = ''
+    this.word2vec = new Word2vec(EMBEDDING['embedding'], EMBEDDING['size'])
+    this.FindWords()
+}
+
+CodeNamesGame.prototype.FindWords = function() {
+    let status = document.getElementById('color-box').value
+    let wordsCount = +document.getElementById('word-count-box').value
+
+    let positive = this.GetNonOpenedWords(status)
+    let negative = this.GetNonOpenedWords(status == RED_STATUS ? BLUE_STATUS : RED_STATUS)
+    let empty = this.GetNonOpenedWords(EMPTY_STATUS)
+    let killer = this.GetNonOpenedWords(GAME_OVER_STATUS)
+    let words = positive.concat(negative).concat(empty).concat(killer)
+    let weights = []
+
+    for (let i = 0; i < positive.length; i++)
+        weights.push(1 / positive.length)
+
+    for (let i = 0; i < negative.length; i++)
+        weights.push(-2 / negative.length)
+
+    for (let i = 0; i < empty.length; i++)
+        weights.push(-1 / empty.length)
+
+    weights.push(-3)
+
+    let top = this.word2vec.GetTopWordsCombination(words, weights, wordsCount)
+
+    let topWordsBox = document.getElementById('top-words-box')
+    topWordsBox.innerHTML = ''
+
+    for (let node of top) {
+        topWordsBox.innerHTML += node.word + ' (' + node.similarity + ')<br>'
     }
 }

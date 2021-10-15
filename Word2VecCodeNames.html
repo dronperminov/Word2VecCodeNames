@@ -19,6 +19,25 @@
                 <button class="button" onclick="game.InitWords()">Сменить слова</button>
                 <button class="button" id="hide-cards-btn" onclick="game.HideCardImages()">Закрыть карты</button>
             </div>
+
+            <div class="predictions-box" id="predictions-box">
+                <h2>Word2vec генератор</h2>
+                <div class="control-block">
+                    <label><b>Цвет слов:</b><br>
+                        <select id="color-box" onchange="game.FindWords()">
+                            <option value="red">Красный</option>
+                            <option value="blue">Синий</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="control-block">
+                    <label><b>Количество слов:</b><br>
+                        <input type="number" id="word-count-box" step="1" min="1" max="9" value="2" onchange="game.FindWords()">
+                    </label>
+                </div>
+
+                <div class="control-block" id="top-words-box"></div>
+            </div>
         </div>
 
         <div class="cell" id="right-cell">
@@ -28,11 +47,14 @@
 
     <script src="js/CodeNamesGame.js"></script>
     <script src="js/words.js"></script>
+    <script src="js/word2vec.js"></script>
+    <script async src="js/embedding.js" onload="game.InitEmbedding()"></script>
     <script>
         let svg = document.getElementById('card-box')
         let wordsBox = document.getElementById('words-box')
+        let predictionsBox = document.getElementById('predictions-box')
 
-        let game = new CodeNamesGame(svg, wordsBox)
+        let game = new CodeNamesGame(svg, wordsBox, predictionsBox)
         game.GenerateField()
     </script>
 </body>
